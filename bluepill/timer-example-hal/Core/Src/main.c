@@ -114,8 +114,8 @@ int main(void)
       HAL_Delay(10);
     }
     for (uint32_t i=0; i < 1000; i+=10){
-      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 1000-i); // increase PWM
-      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, i); // decrease PWM
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 1000-i); // decrease PWM
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, i); // increase PWM
       HAL_Delay(10);
     }
   }
