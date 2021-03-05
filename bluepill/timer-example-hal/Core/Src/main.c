@@ -101,8 +101,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   HAL_TIM_Base_Start(&htim1);
   HAL_TIM_Base_Start(&htim2);
-  HAL_TIM_PWM_Init(&htim1);
-  HAL_TIM_PWM_Init(&htim2);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   while (1)
   {
     /* USER CODE END WHILE */
@@ -111,6 +111,11 @@ int main(void)
     for (uint32_t i=0; i < 1000; i+=10){
       __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, i); // increase PWM
       __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 1000-i); // decrease PWM
+      HAL_Delay(10);
+    }
+    for (uint32_t i=0; i < 1000; i+=10){
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 1000-i); // increase PWM
+      __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, i); // decrease PWM
       HAL_Delay(10);
     }
   }
@@ -146,8 +151,8 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV4;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
@@ -183,7 +188,7 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 71;
+  htim1.Init.Prescaler = 18-1;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim1.Init.Period = 1000;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -219,7 +224,7 @@ static void MX_TIM1_Init(void)
   {
     Error_Handler();
   }
-  sConfigOC.OCMode = TIM_OCMODE_PWM2;
+  sConfigOC.Pulse = 700;
   if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
