@@ -1,14 +1,13 @@
-# Timer Example Using the HAL
+# Use a Timer to create PWM channels with the Hardware Abstraction Layer (HAL) API 
+
+This code uses TIM1 to create the PWM channels. Connect LEDs to PA8 and PA9 and the two LEDs will slowly ramp from 0% to 100% brightness. The LEDs will ramp in opposite directions.
 
 See [main.c](Core/Src/main.c) for the full code
 
-Connect LEDs to PA8 and PA9 and the two LEDs will slowly ramp from 0% to 100% brightness. The LEDs will ramp in opposite directions. 
-
-The heart of the code for this example is in this code chunk:  
+The snippet shows the heart of the code:  
 ```c
 /* USER CODE BEGIN WHILE */
   HAL_TIM_Base_Start(&htim1);
-  HAL_TIM_Base_Start(&htim2);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   while (1)
