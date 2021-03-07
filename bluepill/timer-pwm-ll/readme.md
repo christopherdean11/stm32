@@ -1,4 +1,4 @@
-# Use a Timer to create PWM channels with the LL (LL) API 
+# Use a Timer to create PWM channels with the Low-Level (LL) API 
 
 This code uses TIM1 to create the PWM channels. Connect LEDs to PA8 and PA9 and the two LEDs will slowly ramp from 0% to 100% brightness. The LEDs will ramp in opposite directions.
 
