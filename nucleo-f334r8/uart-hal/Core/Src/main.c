@@ -5,6 +5,7 @@
 #include "user.h"
 
 void SystemClock_Config(void);
+uint8_t uart_rx_buf[4]; // uart buffer
 
 int main(void)
 {
@@ -15,6 +16,7 @@ int main(void)
   MX_DAC1_Init();
   MX_USART2_UART_Init();
 
+  HAL_UART_Receive_IT(&huart2, uart_rx_buf, 4);
   while (1)
   {
     blink();
@@ -22,6 +24,18 @@ int main(void)
   }
 }
 
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+
+  if (uart_rx_buf[3] == '1'){
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 1);
+  }
+  if (uart_rx_buf[3] == '0'){
+    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
+  }
+  // re-trigger uart rx again
+  HAL_UART_Receive_IT(huart, uart_rx_buf, 4);
+}
 
 
 
