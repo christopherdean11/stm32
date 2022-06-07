@@ -2,6 +2,10 @@
     "makefile.extensionOutputFolder": "./.vscode",
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
     "files.associations": {
-        "main.h": "c"
-    }
+        "main.h": "c",
+        "stm32f3xx_hal.h": "c",
+        "stm32f3xx_hal_conf.h": "c"
+    },
+    "cortex-debug.openocdPath.osx": "/usr/local/bin/openocd",
+    "cortex-debug.stlinkPath": "/Applications/STM32CubeIDE.app/Contents/Eclipse/plugins/com.st.stm32cube.ide.mcu.externaltools.stlink-gdb-server.macos64_1.4.0.202007081208/tools/bin/ST-LINK_gdbserver"
 }

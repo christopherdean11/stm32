@@ -3,9 +3,14 @@
 #include "usart.h"
 #include "gpio.h"
 #include "user.h"
+#include <string.h>
 
 void SystemClock_Config(void);
 uint8_t uart_rx_buf[4]; // uart buffer
+enum RX_STATE{START, LED, PWM};
+enum RX_STATE rx_state;
+
+uint16_t volatile blinkDelay = 100;
 
 int main(void)
 {
@@ -16,25 +21,57 @@ int main(void)
   MX_DAC1_Init();
   MX_USART2_UART_Init();
 
+  blink();
+  rx_state = START;
   HAL_UART_Receive_IT(&huart2, uart_rx_buf, 4);
   while (1)
   {
     blink();
-    
   }
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+  // commands
+  // led:set:[0|1] - set led blink speed (0=fast, 1=slow)
 
-  if (uart_rx_buf[3] == '1'){
-    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 1);
+  uint8_t tx_buf[4] = {0};
+  if (rx_state == START)
+  {  
+    if (0 == strncmp((const char*)uart_rx_buf, "led:", 4))
+    {
+      // re-trigger uart rx again
+      HAL_UART_Receive_IT(huart, uart_rx_buf, 1);
+      rx_state = LED;
+      memcpy(tx_buf, "led",3);
+    }
+    if (0 == strncmp((const char*)uart_rx_buf, "pwm:", 4))
+    {
+      // re-trigger uart rx again
+      HAL_UART_Receive_IT(huart, uart_rx_buf, 2);
+      rx_state = PWM;
+      memcpy(tx_buf, "pwm",3);
+    }
+    HAL_UART_Transmit(huart, tx_buf, 3, 100);
+    return;
   }
-  if (uart_rx_buf[3] == '0'){
-    HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
+
+  if (rx_state==LED)
+  {
+    if (0 == strncmp((const char*)uart_rx_buf, "1", 1))
+    {
+      blinkDelay = 500;
+      memcpy(tx_buf, "1", 1);
+    } else {
+      blinkDelay = 50;
+      memcpy(tx_buf, "0", 1);
+    }
+    rx_state = START;
+    HAL_UART_Receive_IT(huart, uart_rx_buf, 4);    
+    HAL_UART_Transmit(huart, tx_buf, 1, 100);
   }
-  // re-trigger uart rx again
-  HAL_UART_Receive_IT(huart, uart_rx_buf, 4);
+
+  
 }
 
 
