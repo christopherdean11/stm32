@@ -43,12 +43,13 @@ typedef struct {
   uint8_t tx_len;
 } UartMessage;
 
+typedef struct {
+  uint32_t Freq;
+  uint32_t Duty;
+} PWM_Config;
 
 void blink(void);
-void processUartData(UartMessage *uartData);
-void processLedMsg(UartMessage *uartData);
-void processPwmMsg(UartMessage *uartData);
 void processCommand(UartMessage *cmd);
 void executeCommand(UartMessage *cmd);
-
+void configTimer(TIM_HandleTypeDef *htim, PWM_Config *pwm);
 #endif

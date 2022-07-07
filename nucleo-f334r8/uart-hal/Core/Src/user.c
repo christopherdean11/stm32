@@ -1,9 +1,12 @@
-#include "user.h"
 #include <string.h>
 #include <math.h>
+#include "user.h"
+#include "tim.h"
+
 
 extern volatile uint16_t blinkDelay;
 extern volatile uint8_t rx_i;
+extern PWM_Config pwm1;
 
 void blink(void)
 {
@@ -112,10 +115,34 @@ void executeCommand(UartMessage *cmd)
       break;
     
     case CMD_PWM:
-    
+      if (cmd->cmdSetGet==CMD_SET){
+        if (cmd->cmdOption == CMDOPT_PWM_FREQ){
+          pwm1.Freq = cmd->value;
+        }else if (cmd->cmdOption==CMDOPT_PWM_DUTY){
+          pwm1.Duty = cmd->value;
+        }else {
+          break;
+        }
+        configTimer(&htim3, &pwm1);
+      }
     break;
     
     default:
     break;;
   }
+}
+
+
+void configTimer(TIM_HandleTypeDef *htim, PWM_Config *pwm)
+{
+  uint32_t TIM_CLK = 64e6;
+  uint32_t div  = (TIM_CLK / pwm->Freq);
+  uint32_t psc_code = (div/UINT16_MAX);
+  uint32_t arr_code = (div/(psc_code+1));
+  uint32_t pwm_code = (uint32_t)(pwm->Duty/100.0 * arr_code);
+
+  __HAL_TIM_SET_PRESCALER(htim, psc_code);
+  __HAL_TIM_SetAutoreload(htim, arr_code);
+  __HAL_TIM_SetCompare(htim, TIM_CHANNEL_1, pwm_code);
+  
 }

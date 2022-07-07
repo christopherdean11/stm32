@@ -3,6 +3,7 @@
 #include "usart.h"
 #include "gpio.h"
 #include "user.h"
+#include "tim.h"
 #include <string.h>
 
 void SystemClock_Config(void);
@@ -15,6 +16,7 @@ uint8_t rx_buf[5];
 uint8_t rx_i = 0;
 UartMessage uartData;
 uint8_t volatile uartDataReady = 0;
+PWM_Config pwm1 = {.Freq=1000, .Duty=30};
 
 int main(void)
 {
@@ -24,6 +26,7 @@ int main(void)
   MX_GPIO_Init();
   MX_DAC1_Init();
   MX_USART2_UART_Init();
+  MX_TIM3_Init();
 
   uartData.isMsgComplete = 0;
   // uartData.msgLength = ledCmd.bufLengths[0]+1; // +1 for the ":"
@@ -32,6 +35,9 @@ int main(void)
   
   HAL_UART_Receive_IT(&huart2, rx_buf, 1);
   uartDataReady = 0;
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+
+  configTimer(&htim3, &pwm1);
   while (1){
 
     if (uartDataReady){
